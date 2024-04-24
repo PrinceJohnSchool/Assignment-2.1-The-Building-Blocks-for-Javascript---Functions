@@ -1,0 +1,147 @@
+HTML:
+<!-- Prince John-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice roll</title>
+    <link rel="stylesheet" href="game.css">
+    <script src="game.js" defer></script>
+</head>
+<body>
+    <div class="die-container"> 
+    </div>
+    <!-- to create a button -->
+    <button type="button" class="btnrd">Roll Dice</button>
+</body>
+</html>
+
+Css: .die-container{
+    display: flex;
+}
+
+.btnrd{
+    margin-top: 10px;
+}
+
+.die{
+    width: 80px;
+    height: 80px;
+    position: relative;
+    margin: 5px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25) ;
+}
+
+.die-dot {
+  /* we'll modify this in js to make our own percentage */
+    --top: 0%;
+    --left: 0%;
+
+   
+    width: 15px;
+    height: 15px;
+    background-color: black;
+    border-radius: 50%;
+
+/* This is where the dot is positioned*/
+    position: absolute;
+    top: var(--top);
+    left: var(--left);
+    /* We added the * 1 so it remains negative. Something I picked up from youtube :P */
+    transform: translateX(calc(var(--left) * -1)) translateY(calc(var(--top) * -1));
+}
+
+
+JS:
+// to create the die function
+function createDie(number) {
+// this is for the dots positions
+    const dotPositionsChange = {
+		1: [
+			[50, 50]
+		],
+		2: [
+			[20, 20],
+			[80, 80]
+		],
+		3: [
+			[20, 20],
+			[50, 50],
+			[80, 80]
+		],
+		4: [
+			[20, 20],
+			[20, 80],
+			[80, 20],
+			[80, 80]
+		],
+		5: [
+			[20, 20],
+			[20, 80],
+			[50, 50],
+			[80, 20],
+			[80, 80]
+		],
+		6: [
+			[20, 20],
+			[20, 80],
+			[50, 20],
+			[50, 80],
+			[80, 20],
+			[80, 80]
+		]
+};
+// same as <div> in html</di>
+const die = document.createElement("div");
+
+die.classList.add("die");
+/* a for of loop in js 😊 */
+for (const dotPosition of dotPositionsChange[number]) {
+    const dot = document.createElement("div");
+// this changes the dots positions
+    dot.classList.add("die-dot");
+    dot.style.setProperty("--top", dotPosition[0] + "%");
+    dot.style.setProperty("--left", dotPosition[1] + "%");
+    die.appendChild(dot);
+
+}
+
+ return die;
+}
+// this is to generate random numbers for the die 1-6
+function randomizeDie(dieContainer, numberOfDice) {
+    dieContainer.innerHTML = "";
+
+    for (let i = 0; i < numberOfDice; i++) {
+        const random = Math.floor((Math.random() * 6) + 1);
+        const die = createDie(random);
+
+        dieContainer.appendChild(die);
+    }
+}
+
+const thedicenumber = 5;
+const dieContainer = document.querySelector(".die-container");
+const buttonrd = document.querySelector(".btnrd");
+
+randomizeDie(dieContainer, thedicenumber);
+
+// for the button to function
+buttonrd.addEventListener("click", () => {
+    // Disable the button
+    buttonrd.disabled = true;
+
+    // Roll the dice
+    const interval = setInterval(() => {
+        randomizeDie(dieContainer, thedicenumber);
+    }, 50);
+
+    // After 1 second (1000 milliseconds), enable the button again this is so the user cant roll while the animation is rolling
+    setTimeout(() => {
+        clearInterval(interval); // Stop the interval
+        buttonrd.disabled = false; // Enable the button
+    }, 1000);
+});
